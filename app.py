@@ -125,6 +125,8 @@ def load_css():
 
 
 def initialize_session_state():
+    if 'quiz_started' not in st.session_state:
+        st.session_state.quiz_started = False  # Prevent auto-start
     if 'current_page' not in st.session_state:
         st.session_state.current_page = 0
     if 'user_answers' not in st.session_state:
@@ -132,11 +134,13 @@ def initialize_session_state():
     if 'show_results' not in st.session_state:
         st.session_state.show_results = False
     if 'start_time' not in st.session_state:
-        st.session_state.start_time = datetime.now()
+        st.session_state.start_time = None  # Start time only set when quiz begins
     if 'time_remaining' not in st.session_state:
         st.session_state.time_remaining = timedelta(minutes=15)
-    if 'review_mode' not in st.session_state:  # ✅ Initialize review_mode
-        st.session_state.review_mode = False  # Default value
+    if 'review_mode' not in st.session_state:
+        st.session_state.review_mode = False
+
+
 
 
 
@@ -258,7 +262,33 @@ def display_review_question(question, index, user_answers):
 
 
 def main():
+    initialize_session_state()
+    
     load_css()
+    
+    if not st.session_state.quiz_started:
+        st.markdown(
+            """
+            <h1 style='text-align: center;'>ABE 501 Engineering <BR> Management Exam Prep 📘🎯</h1><br>
+            <h3 style='text-align: center;'>Practice with Timed Multiple-Choice Questions.</h3>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # st.title("Engineering Management Exam Prep 🎯")
+        # st.markdown("Test your knowledge with timed multiple-choice questions.")
+        # st.image("https://source.unsplash.com/featured/?exam,study", use_container_width=True)  # Optional banner image
+
+
+        if st.button("Click here to Start", type="primary"):
+            st.session_state.quiz_started = True
+            st.session_state.start_time = datetime.now()  # Timer starts here
+            # st.experimental_rerun()
+
+        st.stop()  # Stop execution until quiz starts
+
+    # # If the quiz has started, show the timer and questions
+    # display_timer()
     
     # Header with credits
     st.markdown("""

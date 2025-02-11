@@ -4,8 +4,8 @@ from collections import defaultdict
 import time
 from datetime import datetime, timedelta
 
-# from streamlit_confetti import st_confetti
 from streamlit_confetti import confetti
+import streamlit.components.v1 as components
 
 # Set page config
 st.set_page_config(page_title="MCQ Practice App", 
@@ -46,8 +46,8 @@ def load_css():
             margin: 10px 0;
         }
         .score-card {
-            background-color: #4CAF50;
-            color: white;
+            # background-color: #1F77B4;
+            # color: #FFFFFF;
             padding: 1px;
             border-radius: 10px;
             text-align: center;
@@ -139,27 +139,42 @@ def initialize_session_state():
         st.session_state.review_mode = False  # Default value
 
 
+
+
 def display_timer():
     current_time = datetime.now()
     elapsed_time = current_time - st.session_state.start_time
     remaining_time = st.session_state.time_remaining - elapsed_time
+    remaining_seconds = max(int(remaining_time.total_seconds()), 0)
+    
+    timer_html = f"""
+    <div id="timer" class="timer-widget">
+        Time Remaining: <span id="time">{remaining_seconds//60:02d}:{remaining_seconds%60:02d}</span>
+    </div>
+    <script>
+    (function() {{
+        var duration = {remaining_seconds}; // duration in seconds
+        var display = document.getElementById('time');
+        var timer = duration, minutes, seconds;
+        setInterval(function () {{
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            display.textContent = minutes + ":" + seconds;
+            if (timer > 0) {{
+                timer--;
+            }} else {{
+                // Optional: trigger an action when time is up.
+            }}
+        }}, 1000);
+    }})();
+    </script>
+    """
+    components.html(timer_html, height=100)
 
-    if remaining_time.total_seconds() <= 0:
-        st.session_state.show_results = True
-        st.rerun()
 
-    minutes = int(remaining_time.total_seconds() // 60)
-    seconds = int(remaining_time.total_seconds() % 60)
-
-    timer_placeholder = st.empty()
-    timer_placeholder.markdown(f"""
-        <div class="timer-widget" style="font-size:20px; font-weight:bold;">
-            ⏳ Time Remaining: {minutes:02d}:{seconds:02d}
-        </div>
-    """, unsafe_allow_html=True)
-
-    time.sleep(1)  # Allows 1-second delay before rerunning
-    st.rerun()  # Ensures the UI updates without blocking
+    
 
 
 def display_question(question, index):
@@ -182,57 +197,24 @@ def display_question(question, index):
 
 
 
-# def display_results(questions, results, correct, total):
-#     st.markdown(f"""
-#         <div class="score-card">
-#             <h2>Quiz Complete!</h2>
-#             <h3>Your Score: {correct}/{total} ({(correct/total*100):.1f}%)</h3>
-#         </div>
-#     """, unsafe_allow_html=True)
-    
-#     # Performance summary
-#     performance_data = {
-#         'Correct Answers': correct,
-#         'Wrong Answers': total - correct,
-#         'Accuracy': f"{(correct/total*100):.1f}%"
-#     }
-    
-#     col1, col2 = st.columns(2)
-#     with col1:
-#         st.markdown("### Performance Summary")
-#         for key, value in performance_data.items():
-#             st.markdown(f"**{key}:** {value}")
-    
-#     # Detailed Review
-#     st.markdown("### Question Review")
-#     for result in results:
-#         with st.expander(result['question']):
-#             if result['is_correct']:
-#                 st.markdown(f"""
-#                     <div style='color: #4CAF50;'>
-#                         ✓ Correct! You selected: {result['user_answer']}
-#                     </div>
-#                 """, unsafe_allow_html=True)
-#             else:
-#                 st.markdown(f"""
-#                     <div style='color: #ff4b4b;'>
-#                         ✗ Wrong! You selected: {result['user_answer']}
-#                     </div>
-#                     <div style='color: #4CAF50;'>
-#                         Correct answer: {result['correct_answer']}
-#                     </div>
-#                 """, unsafe_allow_html=True)
-
 def display_score_summary(correct, total):
     st.balloons()
-    # st_confetti()
-    
     st.markdown(f"""
         <div class="score-card">
             <h2>Quiz Complete!</h2>
             <h3>Your Score: {correct}/{total} ({(correct/total*100):.1f}%)</h3>
         </div>
     """, unsafe_allow_html=True)
+    
+    # Performance summary
+    performance_data = {
+        'Correct Answers': correct,
+        'Wrong Answers': total - correct,
+        'Accuracy': f"{(correct/total*100):.1f}%"
+    }
+    st.markdown("### Performance Summary")
+    for key, value in performance_data.items():
+        st.markdown(f"**{key}:** {value}")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -242,9 +224,11 @@ def display_score_summary(correct, total):
             st.rerun()
     with col2:
         if st.button("Retry Quiz"):
-            for key in st.session_state.keys():
+            for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.rerun()
+
+
 
 def display_review_question(question, index, user_answers):
     st.markdown(f"""
@@ -278,8 +262,8 @@ def main():
     
     # Header with credits
     st.markdown("""
-        <h1 style='text-align: center; color: #1f77b4;'>ABE501 MCQ Practice</h1>
-        <h3 style='text-align: center; color: #666;'>Management Engineering Exam Preparation</h3>
+        <h1 style='text-align: center;'>ABE501 MCQ Practice</h1>
+        <h3 style='text-align: center;'>Management Engineering Exam Preparation</h3>
         <div class='credits'>
             Built with ❤️ by <a href='https://github.com/Abdulraqib20' target='_blank'>raqibcodes</a>
         </div>
@@ -289,9 +273,10 @@ def main():
     
     #################################################################################################################
     ################################### QUESTIONS ################################################################
-    # Add your questions list here
-
-    questions = []
+    
+    
+    from questions import questions 
+    
     
     if not questions:
         st.warning("Please add your questions to the questions list!")
@@ -331,6 +316,11 @@ def main():
                 if st.button("Next →"):
                     st.session_state.current_page += 1
                     st.rerun()
+        
+        if st.button("Retry Quiz"):
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+            st.rerun()
     
     else:
         # Create a container for the timer

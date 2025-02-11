@@ -380,6 +380,9 @@ questions = [
             "correct_answer": "C"
         },
         
+        
+        ######################################################################################
+        
         {
             "question": "39. What refers to a process of influencing and supporting others to work enthusiastically toward achieving objectives?",
             "options": [
