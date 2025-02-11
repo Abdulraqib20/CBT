@@ -197,47 +197,6 @@ def display_question(question, index):
 
 
 
-# def display_results(questions, results, correct, total):
-#     st.markdown(f"""
-#         <div class="score-card">
-#             <h2>Quiz Complete!</h2>
-#             <h3>Your Score: {correct}/{total} ({(correct/total*100):.1f}%)</h3>
-#         </div>
-#     """, unsafe_allow_html=True)
-    
-#     # Performance summary
-#     performance_data = {
-#         'Correct Answers': correct,
-#         'Wrong Answers': total - correct,
-#         'Accuracy': f"{(correct/total*100):.1f}%"
-#     }
-    
-#     col1, col2 = st.columns(2)
-#     with col1:
-#         st.markdown("### Performance Summary")
-#         for key, value in performance_data.items():
-#             st.markdown(f"**{key}:** {value}")
-    
-#     # Detailed Review
-#     st.markdown("### Question Review")
-#     for result in results:
-#         with st.expander(result['question']):
-#             if result['is_correct']:
-#                 st.markdown(f"""
-#                     <div style='color: #4CAF50;'>
-#                         ✓ Correct! You selected: {result['user_answer']}
-#                     </div>
-#                 """, unsafe_allow_html=True)
-#             else:
-#                 st.markdown(f"""
-#                     <div style='color: #ff4b4b;'>
-#                         ✗ Wrong! You selected: {result['user_answer']}
-#                     </div>
-#                     <div style='color: #4CAF50;'>
-#                         Correct answer: {result['correct_answer']}
-#                     </div>
-#                 """, unsafe_allow_html=True)
-
 def display_score_summary(correct, total):
     st.balloons()
     st.markdown(f"""
@@ -740,6 +699,11 @@ def main():
                 if st.button("Next →"):
                     st.session_state.current_page += 1
                     st.rerun()
+        
+        if st.button("Retry Quiz"):
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+            st.rerun()
     
     else:
         # Create a container for the timer
