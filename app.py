@@ -655,14 +655,14 @@ def main():
         if st.button("Submit Quiz", key="submit_quiz_hidden", type="primary"):
             st.session_state.show_results = True
             st.balloons()  # Built-in Streamlit celebration effect
-            confetti()  # Additional confetti effect
+            # confetti()  # Additional confetti effect
             st.rerun()
     
     else:
         # Calculate and display results
         correct, total, results = calculate_score(questions)
         st.balloons()  # Celebration effect when showing results
-        confetti()  # Additional confetti effect
+        # confetti()  # Additional confetti effect
         display_results(questions, results, correct, total)
         
         if st.button("Retry Quiz", type="primary"):
