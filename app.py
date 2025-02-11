@@ -4,8 +4,8 @@ from collections import defaultdict
 import time
 from datetime import datetime, timedelta
 
-# from streamlit_confetti import st_confetti
 from streamlit_confetti import confetti
+import streamlit.components.v1 as components
 
 # Set page config
 st.set_page_config(page_title="MCQ Practice App", 
@@ -165,13 +165,13 @@ def display_timer():
             if (timer > 0) {{
                 timer--;
             }} else {{
-                // Optionally, trigger an action when time is up.
+                // Optional: trigger an action when time is up.
             }}
         }}, 1000);
     }})();
     </script>
     """
-    st.markdown(timer_html, unsafe_allow_html=True)
+    components.html(timer_html, height=100)
 
 
     
